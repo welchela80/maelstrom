@@ -33,6 +33,7 @@ for ship_idx, ship in enumerate(data.get('ships', [])):
         for machine_key, mapping in mapping_dict.items():
             machine_name = mapping.get('machine_name', machine_key)
             sensors = mapping.get('sensors', {})
+            system = mapping.get('system_name')
             
             print(f"  Machine: {machine_name}")
             print(f"    Number of sensors: {len(sensors)}")
@@ -46,6 +47,7 @@ for ship_idx, ship in enumerate(data.get('ships', [])):
                 combined_name = f"{machine_name}:{sensor_name}"
                 
                 output_rows.append({
+                    'system': system,
                     'machineName:sensorName': combined_name,
                     'operationalHigh': operational_high,
                     'operationalLow': operational_low
@@ -60,7 +62,7 @@ if len(output_rows) > 0:
 # Write to CSV
 output_csv = './files/sensor_operational_range.csv'
 with open(output_csv, 'w', newline='') as f:
-    fieldnames = ['machineName:sensorName', 'operationalHigh', 'operationalLow']
+    fieldnames = ['system', 'machineName:sensorName', 'operationalHigh', 'operationalLow']
     writer = csv.DictWriter(f, fieldnames=fieldnames)
     
     writer.writeheader()

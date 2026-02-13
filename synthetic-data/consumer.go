@@ -71,20 +71,21 @@ func loadOperationalLimits(filename string) error {
 
 	// Skip header row
 	for i := 1; i < len(records); i++ {
-		if len(records[i]) < 3 {
+		if len(records[i]) < 4 {
 			continue
 		}
 
-		sensorName := records[i][0]
-		high, err := strconv.ParseFloat(records[i][1], 64)
+		system := records[i][0]
+		sensorName := records[i][1]
+		high, err := strconv.ParseFloat(records[i][2], 64)
 		if err != nil {
-			log.Printf("Warning: Invalid high value for %s: %s", sensorName, records[i][1])
+			log.Printf("Warning: Invalid high value for %s: %s", sensorName, records[i][2])
 			continue
 		}
 
-		low, err := strconv.ParseFloat(records[i][2], 64)
+		low, err := strconv.ParseFloat(records[i][3], 64)
 		if err != nil {
-			log.Printf("Warning: Invalid low value for %s: %s", sensorName, records[i][2])
+			log.Printf("Warning: Invalid low value for %s: %s", sensorName, records[i][3])
 			continue
 		}
 
@@ -93,43 +94,22 @@ func loadOperationalLimits(filename string) error {
 			OperationalHigh: high,
 			OperationalLow:  low,
 		}
+
+		// Log system info for first few entries
+		if i <= 3 {
+			log.Printf("Loaded: System=%s, Sensor=%s, Range=[%.2f - %.2f]", system, sensorName, low, high)
+		}
 	}
 
 	log.Printf("Loaded %d operational limits", len(operationalLimits))
 	return nil
 }
 
-func checkSensorValue(sensorName string, valueStr string) (bool, string) {
-	// Try to parse the value
-	value, err := strconv.ParseFloat(valueStr, 64)
-	if err != nil {
-		// Value might be a state/string, skip numeric checks
-		return false, ""
-	}
-
-	// Check if we have limits for this sensor
-	limit, exists := operationalLimits[sensorName]
-	if !exists {
-		return false, ""
-	}
-
-	// Check if value is out of range
-	if value > limit.OperationalHigh {
-		msg := fmt.Sprintf("⚠️  ALERT: %s = %.2f (ABOVE HIGH LIMIT: %.2f)",
-			sensorName, value, limit.OperationalHigh)
-		return true, msg
-	} else if value < limit.OperationalLow {
-		msg := fmt.Sprintf("⚠️  ALERT: %s = %.2f (BELOW LOW LIMIT: %.2f)",
-			sensorName, value, limit.OperationalLow)
-		return true, msg
-	}
-
-	return false, ""
-}
-
 func addReadingToAggregate(reading SensorReading) {
 	aggregateMutex.Lock()
 	defer aggregateMutex.Unlock()
+
+	currentTime := time.Now()
 
 	for sensorName, valueStr := range reading.Readings {
 		// Try to parse the value
@@ -150,6 +130,9 @@ func addReadingToAggregate(reading SensorReading) {
 		}
 		sensorAggregates[sensorName].Sum += value
 		sensorAggregates[sensorName].Count++
+
+		// Feed data to analytics engine
+		AddDataPoint(sensorName, value, currentTime)
 	}
 }
 
@@ -231,7 +214,7 @@ func printAverageReport() {
 			inRangeCount++
 			// Within range - check percentage for fine-tuned status
 			if avgValue == 0 {
-				status = "⚫ OFFLINE"
+				status = "⚪ OFFLINE"
 				offlineCount++
 				machineStats[machineName].OfflineSensors++
 			} else if percentage >= 20 && percentage <= 80 {
@@ -262,6 +245,39 @@ func printAverageReport() {
 	fmt.Println("\n=== MACHINE STATUS ===")
 	fmt.Println("  " + strings.Repeat("=", 130))
 
+	// Prepare data for JSON export
+	type MachineStatusJSON struct {
+		Status         string  `json:"status"`
+		Running        string  `json:"running"`
+		AvgPercentage  float64 `json:"avg_percentage"`
+		GoodSensors    int     `json:"good_sensors"`
+		WarningSensors int     `json:"warning_sensors"`
+		OfflineSensors int     `json:"offline_sensors"`
+		FaultSensors   int     `json:"fault_sensors"`
+		TotalSensors   int     `json:"total_sensors"`
+		Timestamp      string  `json:"timestamp"`
+
+		// Analytics fields
+		OverallTrend      string  `json:"overall_trend,omitempty"`
+		HealthScore       float64 `json:"health_score,omitempty"`
+		SensorsAtRisk     int     `json:"sensors_at_risk,omitempty"`
+		EstimatedFailTime int     `json:"estimated_fail_time,omitempty"`
+		TrendConfidence   string  `json:"trend_confidence,omitempty"`
+	}
+
+	machineStatusJSON := make(map[string]MachineStatusJSON)
+
+	// Perform trend analysis for each machine
+	type MachineAnalytics struct {
+		OverallTrend      string
+		HealthScore       float64
+		SensorsAtRisk     int
+		EstimatedFailTime int
+		Confidence        string
+	}
+
+	machineAnalytics := make(map[string]MachineAnalytics)
+
 	for machineName, stats := range machineStats {
 		// Calculate average percentage for sensors in range
 		inRangeSensors := stats.GoodSensors + stats.WarningSensors + stats.OfflineSensors
@@ -279,30 +295,87 @@ func printAverageReport() {
 
 		// Machine has critical issues if any sensors are above/below range
 		if stats.AboveSensors > 0 || stats.BelowSensors > 0 {
-			machineStatus = "🔴 CRITICAL"
+			machineStatus = "CRITICAL"
 			isRunning = "RUNNING (FAULT)"
 		} else if offlineRatio > 0.5 {
-			machineStatus = "⚪ OFFLINE"
+			machineStatus = "OFFLINE"
 			isRunning = "NOT RUNNING"
 		} else if stats.WarningSensors > stats.GoodSensors {
-			machineStatus = "🟡 WARNING"
+			machineStatus = "WARNING"
 			isRunning = "RUNNING"
 		} else if stats.GoodSensors > 0 {
-			machineStatus = "🟢 GOOD"
+			machineStatus = "GOOD"
 			isRunning = "RUNNING"
 		} else {
-			machineStatus = "🔵 UNCERTAIN"
+			machineStatus = "UNCERTAIN"
 			isRunning = "UNKNOWN"
 		}
 
-		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
-			machineName, machineStatus, isRunning, avgPercentage,
-			stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
-			stats.AboveSensors+stats.BelowSensors)
+		// Perform trend analysis
+		trend := AnalyzeMachineTrends(machineName, stats)
+		if trend != nil {
+			machineAnalytics[machineName] = MachineAnalytics{
+				OverallTrend:      trend.OverallTrend,
+				HealthScore:       trend.HealthScore,
+				SensorsAtRisk:     trend.SensorsAtRisk,
+				EstimatedFailTime: trend.EstimatedFailTime,
+				Confidence:        trend.Confidence,
+			}
+
+			// Print status with analytics
+			failTimeStr := "N/A"
+			if trend.EstimatedFailTime > 0 {
+				minutes := trend.EstimatedFailTime / 60
+				failTimeStr = fmt.Sprintf("%dm", minutes)
+			}
+
+			fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%%\n",
+				machineName, machineStatus, isRunning, avgPercentage)
+			fmt.Printf("  %-30s Trend: %-12s | Health: %5.1f | Risk: %2d sensors | Fail: %8s | Conf: %s\n",
+				"", trend.OverallTrend, trend.HealthScore, trend.SensorsAtRisk, failTimeStr, trend.Confidence)
+		} else {
+			fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
+				machineName, machineStatus, isRunning, avgPercentage,
+				stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
+				stats.AboveSensors+stats.BelowSensors)
+		}
+
+		// Add to JSON export
+		statusJSON := MachineStatusJSON{
+			Status:         machineStatus,
+			Running:        isRunning,
+			AvgPercentage:  avgPercentage,
+			GoodSensors:    stats.GoodSensors,
+			WarningSensors: stats.WarningSensors,
+			OfflineSensors: stats.OfflineSensors,
+			FaultSensors:   stats.AboveSensors + stats.BelowSensors,
+			TotalSensors:   stats.TotalSensors,
+			Timestamp:      time.Now().Format(time.RFC3339),
+		}
+
+		// Add analytics if available
+		if analytics, hasAnalytics := machineAnalytics[machineName]; hasAnalytics {
+			statusJSON.OverallTrend = analytics.OverallTrend
+			statusJSON.HealthScore = analytics.HealthScore
+			statusJSON.SensorsAtRisk = analytics.SensorsAtRisk
+			statusJSON.EstimatedFailTime = analytics.EstimatedFailTime
+			statusJSON.TrendConfidence = analytics.Confidence
+		}
+
+		machineStatusJSON[machineName] = statusJSON
 	}
 
 	fmt.Println("  " + strings.Repeat("=", 130))
 	fmt.Println()
+
+	// Write to JSON file for Streamlit dashboard
+	jsonData, err := json.MarshalIndent(machineStatusJSON, "", "  ")
+	if err == nil {
+		err = os.WriteFile("machine_status.json", jsonData, 0644)
+		if err != nil {
+			log.Printf("Warning: Could not write machine_status.json: %s", err)
+		}
+	}
 
 	// Reset aggregates for next window
 	sensorAggregates = make(map[string]*SensorAggregate)
@@ -320,6 +393,9 @@ func main() {
 		log.Printf("Warning: Could not load operational limits: %s", err)
 		log.Println("Continuing without limit checking...")
 	}
+
+	// Initialize analytics engine
+	initAnalytics()
 
 	// Initialize aggregates
 	sensorAggregates = make(map[string]*SensorAggregate)
@@ -406,6 +482,7 @@ func main() {
 
 	log.Printf("Consumer started. Waiting for messages on queue '%s'...", queueName)
 	log.Printf("Reports will be generated every 10 seconds")
+	log.Printf("Analytics engine initialized - tracking trends and predictions")
 	log.Printf("Press CTRL+C to exit")
 
 	// Wait for interrupt signal
