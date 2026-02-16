@@ -225,7 +225,6 @@ if machine_status:
                                 <div style="font-size: 24px; margin-bottom: 10px;">{emoji} {machine_name}</div>
                                 <div style="font-size: 32px; margin: 10px 0;">{machine['avg_percentage']:.1f}%</div>
                                 <div style="font-size: 14px; opacity: 0.9;">{machine['running']}</div>
-                                <div style="font-size: 14px; opacity: 0.9;">{machine.get('overall_trend', 'No Trend')}</div>
                                 <div style="font-size: 12px; margin-top: 10px;">
                                     ✓{machine['good_sensors']} ⚠{machine['warning_sensors']} 
                                     ⚪{machine['offline_sensors']} ✗{machine['fault_sensors']}
@@ -250,15 +249,55 @@ if machine_status:
             
             # Get machines for selected system
             if selected_system == "All Systems":
-                available_machines = machines
+                available_machines = list(machines)
             else:
                 available_machines = machine_groups.get(selected_system, [])
             
             # Machine selection
-            machine_options = ["Select a machine..."] + sorted(available_machines)
+            machine_options = ["All Machines in System"] + sorted(available_machines)
             selected_machine = st.sidebar.selectbox("Select Machine", options=machine_options, index=0)
             
-            if selected_machine != "Select a machine...":
+            # Show timeline for selected machine(s)
+            if selected_machine == "All Machines in System":
+                # Show all machines in the selected system
+                machines_to_show = available_machines
+                
+                if machines_to_show:
+                    fig = go.Figure()
+                    for machine_name in machines_to_show:
+                        history = st.session_state.machine_history[machine_name]
+                        if len(history['percentages']) > 0:
+                            status = machine_status[machine_name]['status']
+                            color_map = {'GOOD': 'green', 'WARNING': 'orange', 'CRITICAL': 'red', 'OFFLINE': 'gray', 'UNCERTAIN': 'blue'}
+                            color = color_map.get(status, 'blue')
+                            fig.add_trace(go.Scatter(
+                                x=list(history['timestamps']),
+                                y=list(history['percentages']),
+                                mode='lines+markers',
+                                name=machine_name,
+                                line=dict(width=2, color=color),
+                                marker=dict(size=4)
+                            ))
+                    
+                    fig.add_hline(y=20, line_dash="dash", line_color="blue", annotation_text="20% (Low Threshold)")
+                    fig.add_hline(y=80, line_dash="dash", line_color="orange", annotation_text="80% (High Threshold)")
+                    fig.add_hrect(y0=20, y1=80, fillcolor="green", opacity=0.1)
+                    
+                    title_text = f"All Machines in {selected_system}" if selected_system != "All Systems" else "All Machines"
+                    fig.update_layout(
+                        title=f"{title_text} - Average Percentage Over Time",
+                        xaxis_title="Time",
+                        yaxis_title="Average %",
+                        yaxis=dict(range=[-10, 110]),
+                        height=600,
+                        showlegend=True,
+                        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("No machines available in the selected system")
+            else:
+                # Show single machine timeline
                 history = st.session_state.machine_history[selected_machine]
                 if len(history['percentages']) > 0:
                     fig = go.Figure()
@@ -282,8 +321,6 @@ if machine_status:
                         showlegend=False
                     )
                     st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Please select a machine from the dropdown to view its timeline")
         
         else:  # Grouped by System
             # System selection
@@ -335,21 +372,43 @@ if machine_status:
                     
                     # Stats table
                     st.subheader(f"Detailed Statistics")
-                    stats_data = []
-                    for machine_name in selected_machines_in_group:
-                        machine = machine_status[machine_name]
-                        stats_data.append({
-                            'Machine': machine_name,
-                            'Status': f"{get_status_emoji(machine['status'])} {machine['status']}",
-                            'Avg %': f"{machine['avg_percentage']:.1f}%",
-                            'Running': machine.get('overall_trend', 'No Trend'),
-                            'Trend': machine['overall_trend'],
-                            'Good': machine['good_sensors'],
-                            'Warning': machine['warning_sensors'],
-                            'Offline': machine['offline_sensors'],
-                            'Fault': machine['fault_sensors']
-                        })
-                    st.dataframe(stats_data, use_container_width=True, hide_index=True)
+                    
+                    try:
+                        stats_data = []
+                        for machine_name in selected_machines_in_group:
+                            if machine_name in machine_status:
+                                machine = machine_status[machine_name]
+                                
+                                # Build row with safe .get() calls
+                                row = {
+                                    'Machine': machine_name,
+                                    'Status': f"{get_status_emoji(machine.get('status', 'UNCERTAIN'))} {machine.get('status', 'UNCERTAIN')}",
+                                    'Avg %': f"{machine.get('avg_percentage', 0):.1f}%",
+                                    'Running': machine.get('running', 'UNKNOWN'),
+                                    'Good': machine.get('good_sensors', 0),
+                                    'Warning': machine.get('warning_sensors', 0),
+                                    'Offline': machine.get('offline_sensors', 0),
+                                    'Fault': machine.get('fault_sensors', 0)
+                                }
+                                
+                                # Add analytics fields if available
+                                if 'overall_trend' in machine:
+                                    row['Trend'] = machine['overall_trend']
+                                if 'health_score' in machine:
+                                    row['Health'] = f"{machine['health_score']:.1f}"
+                                
+                                stats_data.append(row)
+                        
+                        if stats_data:
+                            st.dataframe(stats_data, use_container_width=True, hide_index=True)
+                        else:
+                            st.info("No statistics available for selected machines")
+                    except KeyError as e:
+                        st.error(f"Missing data field: {e}")
+                        st.write("Available fields:", list(machine_status[selected_machines_in_group[0]].keys()) if selected_machines_in_group and selected_machines_in_group[0] in machine_status else "None")
+                    except Exception as e:
+                        st.error(f"Error displaying statistics: {e}")
+                        st.write("Debug - Selected machines:", selected_machines_in_group)
 
 else:
     st.warning("⚠️ Waiting for data from Go consumer...")

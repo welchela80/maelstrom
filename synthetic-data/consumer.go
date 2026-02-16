@@ -109,8 +109,6 @@ func addReadingToAggregate(reading SensorReading) {
 	aggregateMutex.Lock()
 	defer aggregateMutex.Unlock()
 
-	currentTime := time.Now()
-
 	for sensorName, valueStr := range reading.Readings {
 		// Try to parse the value
 		value, err := strconv.ParseFloat(valueStr, 64)
@@ -130,9 +128,6 @@ func addReadingToAggregate(reading SensorReading) {
 		}
 		sensorAggregates[sensorName].Sum += value
 		sensorAggregates[sensorName].Count++
-
-		// Feed data to analytics engine
-		AddDataPoint(sensorName, value, currentTime)
 	}
 }
 
@@ -222,7 +217,7 @@ func printAverageReport() {
 				goodCount++
 				machineStats[machineName].GoodSensors++
 			} else if percentage < 20 {
-				status = "🔵 POSSIBLY OFFLINE"
+				status = "⚪ STANDBY" // Changed from "POSSIBLY OFFLINE"
 				offlineCount++
 				machineStats[machineName].OfflineSensors++
 			} else { // percentage > 80
@@ -256,27 +251,9 @@ func printAverageReport() {
 		FaultSensors   int     `json:"fault_sensors"`
 		TotalSensors   int     `json:"total_sensors"`
 		Timestamp      string  `json:"timestamp"`
-
-		// Analytics fields
-		OverallTrend      string  `json:"overall_trend,omitempty"`
-		HealthScore       float64 `json:"health_score,omitempty"`
-		SensorsAtRisk     int     `json:"sensors_at_risk,omitempty"`
-		EstimatedFailTime int     `json:"estimated_fail_time,omitempty"`
-		TrendConfidence   string  `json:"trend_confidence,omitempty"`
 	}
 
 	machineStatusJSON := make(map[string]MachineStatusJSON)
-
-	// Perform trend analysis for each machine
-	type MachineAnalytics struct {
-		OverallTrend      string
-		HealthScore       float64
-		SensorsAtRisk     int
-		EstimatedFailTime int
-		Confidence        string
-	}
-
-	machineAnalytics := make(map[string]MachineAnalytics)
 
 	for machineName, stats := range machineStats {
 		// Calculate average percentage for sensors in range
@@ -290,16 +267,16 @@ func printAverageReport() {
 		var machineStatus string
 		var isRunning string
 
-		// Machine is offline if >50% of sensors are offline/possibly offline
+		// Machine is offline/standby if >50% of sensors are offline
 		offlineRatio := float64(stats.OfflineSensors) / float64(stats.TotalSensors)
 
-		// Machine has critical issues if any sensors are above/below range
+		// Machine has critical issues ONLY if sensors are outside limits (not just low)
 		if stats.AboveSensors > 0 || stats.BelowSensors > 0 {
 			machineStatus = "CRITICAL"
 			isRunning = "RUNNING (FAULT)"
 		} else if offlineRatio > 0.5 {
 			machineStatus = "OFFLINE"
-			isRunning = "NOT RUNNING"
+			isRunning = "STANDBY" // Changed from "NOT RUNNING"
 		} else if stats.WarningSensors > stats.GoodSensors {
 			machineStatus = "WARNING"
 			isRunning = "RUNNING"
@@ -311,34 +288,10 @@ func printAverageReport() {
 			isRunning = "UNKNOWN"
 		}
 
-		// Perform trend analysis
-		trend := AnalyzeMachineTrends(machineName, stats)
-		if trend != nil {
-			machineAnalytics[machineName] = MachineAnalytics{
-				OverallTrend:      trend.OverallTrend,
-				HealthScore:       trend.HealthScore,
-				SensorsAtRisk:     trend.SensorsAtRisk,
-				EstimatedFailTime: trend.EstimatedFailTime,
-				Confidence:        trend.Confidence,
-			}
-
-			// Print status with analytics
-			failTimeStr := "N/A"
-			if trend.EstimatedFailTime > 0 {
-				minutes := trend.EstimatedFailTime / 60
-				failTimeStr = fmt.Sprintf("%dm", minutes)
-			}
-
-			fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%%\n",
-				machineName, machineStatus, isRunning, avgPercentage)
-			fmt.Printf("  %-30s Trend: %-12s | Health: %5.1f | Risk: %2d sensors | Fail: %8s | Conf: %s\n",
-				"", trend.OverallTrend, trend.HealthScore, trend.SensorsAtRisk, failTimeStr, trend.Confidence)
-		} else {
-			fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
-				machineName, machineStatus, isRunning, avgPercentage,
-				stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
-				stats.AboveSensors+stats.BelowSensors)
-		}
+		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
+			machineName, machineStatus, isRunning, avgPercentage,
+			stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
+			stats.AboveSensors+stats.BelowSensors)
 
 		// Add to JSON export
 		statusJSON := MachineStatusJSON{
@@ -351,15 +304,6 @@ func printAverageReport() {
 			FaultSensors:   stats.AboveSensors + stats.BelowSensors,
 			TotalSensors:   stats.TotalSensors,
 			Timestamp:      time.Now().Format(time.RFC3339),
-		}
-
-		// Add analytics if available
-		if analytics, hasAnalytics := machineAnalytics[machineName]; hasAnalytics {
-			statusJSON.OverallTrend = analytics.OverallTrend
-			statusJSON.HealthScore = analytics.HealthScore
-			statusJSON.SensorsAtRisk = analytics.SensorsAtRisk
-			statusJSON.EstimatedFailTime = analytics.EstimatedFailTime
-			statusJSON.TrendConfidence = analytics.Confidence
 		}
 
 		machineStatusJSON[machineName] = statusJSON
@@ -393,9 +337,6 @@ func main() {
 		log.Printf("Warning: Could not load operational limits: %s", err)
 		log.Println("Continuing without limit checking...")
 	}
-
-	// Initialize analytics engine
-	initAnalytics()
 
 	// Initialize aggregates
 	sensorAggregates = make(map[string]*SensorAggregate)
@@ -482,7 +423,6 @@ func main() {
 
 	log.Printf("Consumer started. Waiting for messages on queue '%s'...", queueName)
 	log.Printf("Reports will be generated every 10 seconds")
-	log.Printf("Analytics engine initialized - tracking trends and predictions")
 	log.Printf("Press CTRL+C to exit")
 
 	// Wait for interrupt signal
