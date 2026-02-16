@@ -2,90 +2,90 @@
   "AC 1": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 49.93735269290557,
-    "good_sensors": 76,
-    "warning_sensors": 7,
+    "avg_percentage": 50.13612988832297,
+    "good_sensors": 77,
+    "warning_sensors": 6,
     "offline_sensors": 6,
     "fault_sensors": 1,
     "total_sensors": 90,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "AC 2": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 53.931086105724134,
+    "avg_percentage": 53.81815859128381,
     "good_sensors": 75,
     "warning_sensors": 9,
     "offline_sensors": 5,
     "fault_sensors": 1,
     "total_sensors": 90,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "AC 3": {
     "status": "OFFLINE",
     "running": "STANDBY",
-    "avg_percentage": 1.2919964590459113e-15,
+    "avg_percentage": 1.2919964590459111e-15,
     "good_sensors": 0,
     "warning_sensors": 0,
     "offline_sensors": 90,
     "fault_sensors": 0,
     "total_sensors": 90,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "AC 4": {
     "status": "OFFLINE",
     "running": "STANDBY",
-    "avg_percentage": 1.2919964590459113e-15,
+    "avg_percentage": 1.2919964590459111e-15,
     "good_sensors": 0,
     "warning_sensors": 0,
     "offline_sensors": 90,
     "fault_sensors": 0,
     "total_sensors": 90,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "ACs": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 57.24600000000001,
+    "avg_percentage": 57.22180555555556,
     "good_sensors": 7,
     "warning_sensors": 1,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 8,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "AIR": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 58.507110395524336,
-    "good_sensors": 19,
-    "warning_sensors": 26,
+    "avg_percentage": 59.248846531933964,
+    "good_sensors": 17,
+    "warning_sensors": 28,
     "offline_sensors": 16,
     "fault_sensors": 0,
     "total_sensors": 61,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "BILGE": {
     "status": "OFFLINE",
     "running": "STANDBY",
-    "avg_percentage": 25.555555555555557,
+    "avg_percentage": 27.160493827160494,
     "good_sensors": 1,
     "warning_sensors": 2,
     "offline_sensors": 6,
     "fault_sensors": 0,
     "total_sensors": 9,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CPP 1": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 48.765193715128326,
-    "good_sensors": 25,
-    "warning_sensors": 13,
-    "offline_sensors": 14,
+    "avg_percentage": 48.52363453670359,
+    "good_sensors": 27,
+    "warning_sensors": 12,
+    "offline_sensors": 13,
     "fault_sensors": 1,
     "total_sensors": 53,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CPP 2": {
     "status": "OFFLINE",
@@ -96,117 +96,117 @@
     "offline_sensors": 53,
     "fault_sensors": 0,
     "total_sensors": 53,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CPP FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 48.00888217048405,
+    "avg_percentage": 47.984485832344156,
     "good_sensors": 8,
     "warning_sensors": 2,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 12,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CPPs": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 50.033548536027105,
+    "avg_percentage": 49.97859050060528,
     "good_sensors": 3,
     "warning_sensors": 1,
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CTM": {
     "status": "OFFLINE",
     "running": "STANDBY",
-    "avg_percentage": 37.05882352941177,
+    "avg_percentage": 37.25490196078431,
     "good_sensors": 3,
     "warning_sensors": 5,
     "offline_sensors": 9,
     "fault_sensors": 0,
     "total_sensors": 17,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "CW": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 58.51851851851852,
-    "good_sensors": 2,
-    "warning_sensors": 15,
+    "avg_percentage": 60.08230452674897,
+    "good_sensors": 1,
+    "warning_sensors": 16,
     "offline_sensors": 10,
     "fault_sensors": 0,
     "total_sensors": 27,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "DCS": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 48.7432092550621,
-    "good_sensors": 324,
-    "warning_sensors": 778,
-    "offline_sensors": 831,
+    "avg_percentage": 48.845434840659294,
+    "good_sensors": 309,
+    "warning_sensors": 789,
+    "offline_sensors": 835,
     "fault_sensors": 1,
     "total_sensors": 1934,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "DCS SUP": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 48.984302862419206,
-    "good_sensors": 63,
-    "warning_sensors": 499,
-    "offline_sensors": 521,
+    "avg_percentage": 48.52775212886016,
+    "good_sensors": 62,
+    "warning_sensors": 496,
+    "offline_sensors": 525,
     "fault_sensors": 0,
     "total_sensors": 1083,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "DRN EDUC": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 51.02628571428572,
+    "avg_percentage": 50.9965343915344,
     "good_sensors": 14,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 14,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "EOT": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 95,
-    "good_sensors": 1,
-    "warning_sensors": 3,
+    "avg_percentage": 97.22222222222223,
+    "good_sensors": 0,
+    "warning_sensors": 4,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 4,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "EP": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 48.893954934858215,
+    "avg_percentage": 49.07683419541415,
     "good_sensors": 73,
-    "warning_sensors": 100,
-    "offline_sensors": 108,
+    "warning_sensors": 102,
+    "offline_sensors": 106,
     "fault_sensors": 0,
     "total_sensors": 281,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FADC 1": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 50.04477104279821,
-    "good_sensors": 87,
-    "warning_sensors": 182,
-    "offline_sensors": 184,
+    "avg_percentage": 49.8255979729861,
+    "good_sensors": 84,
+    "warning_sensors": 183,
+    "offline_sensors": 186,
     "fault_sensors": 0,
     "total_sensors": 453,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FADC 2": {
     "status": "OFFLINE",
@@ -217,7 +217,7 @@
     "offline_sensors": 473,
     "fault_sensors": 0,
     "total_sensors": 473,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FADC 3": {
     "status": "OFFLINE",
@@ -228,128 +228,128 @@
     "offline_sensors": 473,
     "fault_sensors": 0,
     "total_sensors": 473,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 52.18382595020721,
-    "good_sensors": 38,
+    "avg_percentage": 51.52780744354561,
+    "good_sensors": 36,
     "warning_sensors": 12,
-    "offline_sensors": 9,
+    "offline_sensors": 11,
     "fault_sensors": 0,
     "total_sensors": 59,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FM": {
-    "status": "WARNING",
-    "running": "RUNNING",
-    "avg_percentage": 47.60426138032305,
-    "good_sensors": 11,
+    "status": "OFFLINE",
+    "running": "STANDBY",
+    "avg_percentage": 46.9724000652635,
+    "good_sensors": 10,
     "warning_sensors": 103,
-    "offline_sensors": 113,
+    "offline_sensors": 114,
     "fault_sensors": 0,
     "total_sensors": 227,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO SVC": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 44.35590337132004,
+    "avg_percentage": 44.369787379972564,
     "good_sensors": 14,
     "warning_sensors": 1,
     "offline_sensors": 3,
     "fault_sensors": 0,
     "total_sensors": 18,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO SVC FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 53.19199156680642,
+    "avg_percentage": 53.207476828825754,
     "good_sensors": 8,
     "warning_sensors": 8,
     "offline_sensors": 6,
     "fault_sensors": 0,
     "total_sensors": 22,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO SVC MCS": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 53.823543007806386,
+    "avg_percentage": 53.07531813147286,
     "good_sensors": 11,
-    "warning_sensors": 51,
-    "offline_sensors": 43,
+    "warning_sensors": 50,
+    "offline_sensors": 44,
     "fault_sensors": 0,
     "total_sensors": 105,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO XFER": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 52.366500000000016,
+    "avg_percentage": 52.07777777777777,
     "good_sensors": 4,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 4,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO XFER FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 52.19059201623017,
-    "good_sensors": 131,
+    "avg_percentage": 52.361110616347496,
+    "good_sensors": 132,
     "warning_sensors": 82,
-    "offline_sensors": 70,
+    "offline_sensors": 69,
     "fault_sensors": 0,
     "total_sensors": 283,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FO XFER MCS": {
     "status": "OFFLINE",
     "running": "STANDBY",
-    "avg_percentage": 40.93533284996459,
+    "avg_percentage": 40.020811085256504,
     "good_sensors": 2,
     "warning_sensors": 4,
     "offline_sensors": 7,
     "fault_sensors": 0,
     "total_sensors": 13,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 1": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 58.63099999999999,
+    "avg_percentage": 63.383629629629624,
     "good_sensors": 2,
     "warning_sensors": 5,
     "offline_sensors": 3,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 2": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 75.79683333333334,
+    "avg_percentage": 75.80533333333332,
     "good_sensors": 1,
     "warning_sensors": 7,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 3": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 52.19573333333333,
-    "good_sensors": 2,
-    "warning_sensors": 4,
+    "avg_percentage": 54.028999999999996,
+    "good_sensors": 1,
+    "warning_sensors": 5,
     "offline_sensors": 4,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 4": {
     "status": "OFFLINE",
@@ -360,7 +360,7 @@
     "offline_sensors": 10,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 5": {
     "status": "OFFLINE",
@@ -371,7 +371,7 @@
     "offline_sensors": 10,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FP 6": {
     "status": "OFFLINE",
@@ -382,73 +382,73 @@
     "offline_sensors": 10,
     "fault_sensors": 0,
     "total_sensors": 10,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FREEZE CHILL": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 48.47999999999999,
+    "avg_percentage": 48.727777777777796,
     "good_sensors": 2,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 2,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FW": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 52.06913949652487,
+    "avg_percentage": 51.86961860433494,
     "good_sensors": 20,
     "warning_sensors": 26,
     "offline_sensors": 24,
     "fault_sensors": 0,
     "total_sensors": 70,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "FW FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 41.347349514239355,
+    "avg_percentage": 41.345719441170935,
     "good_sensors": 8,
     "warning_sensors": 4,
     "offline_sensors": 8,
     "fault_sensors": 0,
     "total_sensors": 20,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GT WST FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 55.69589055666316,
-    "good_sensors": 6,
-    "warning_sensors": 2,
+    "avg_percentage": 53.08314055512016,
+    "good_sensors": 7,
+    "warning_sensors": 1,
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 9,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GT WST MCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 28.609040642735604,
-    "good_sensors": 4,
+    "avg_percentage": 27.17389979324584,
+    "good_sensors": 3,
     "warning_sensors": 0,
-    "offline_sensors": 2,
+    "offline_sensors": 3,
     "fault_sensors": 0,
     "total_sensors": 6,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTG 1": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 46.321081418046305,
-    "good_sensors": 65,
+    "avg_percentage": 46.34198761341883,
+    "good_sensors": 64,
     "warning_sensors": 74,
-    "offline_sensors": 91,
+    "offline_sensors": 92,
     "fault_sensors": 0,
     "total_sensors": 230,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTG 2": {
     "status": "OFFLINE",
@@ -459,7 +459,7 @@
     "offline_sensors": 243,
     "fault_sensors": 0,
     "total_sensors": 243,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTG 3": {
     "status": "OFFLINE",
@@ -470,51 +470,51 @@
     "offline_sensors": 243,
     "fault_sensors": 0,
     "total_sensors": 243,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTGs": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 44.086532768772884,
+    "avg_percentage": 43.97442550962779,
     "good_sensors": 6,
     "warning_sensors": 6,
     "offline_sensors": 9,
     "fault_sensors": 0,
     "total_sensors": 21,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTGs FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 57.50747105646383,
+    "avg_percentage": 57.46843956163495,
     "good_sensors": 10,
     "warning_sensors": 7,
     "offline_sensors": 3,
     "fault_sensors": 0,
     "total_sensors": 20,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTM 1A": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 44.733774061113024,
+    "avg_percentage": 44.50876329400258,
     "good_sensors": 48,
-    "warning_sensors": 79,
-    "offline_sensors": 103,
+    "warning_sensors": 78,
+    "offline_sensors": 104,
     "fault_sensors": 0,
     "total_sensors": 230,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTM 1B": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 53.52224968786812,
+    "avg_percentage": 53.379664139502616,
     "good_sensors": 55,
-    "warning_sensors": 97,
-    "offline_sensors": 78,
+    "warning_sensors": 95,
+    "offline_sensors": 80,
     "fault_sensors": 0,
     "total_sensors": 230,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTM 2A": {
     "status": "OFFLINE",
@@ -525,7 +525,7 @@
     "offline_sensors": 230,
     "fault_sensors": 0,
     "total_sensors": 230,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTM 2B": {
     "status": "OFFLINE",
@@ -536,29 +536,29 @@
     "offline_sensors": 230,
     "fault_sensors": 0,
     "total_sensors": 230,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "GTMs": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 35.58399192982456,
+    "avg_percentage": 35.59343831801727,
     "good_sensors": 5,
     "warning_sensors": 0,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 7,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPAC 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 50.7173622829149,
+    "avg_percentage": 50.767953944198254,
     "good_sensors": 34,
     "warning_sensors": 1,
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 36,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPAC 2": {
     "status": "OFFLINE",
@@ -569,29 +569,29 @@
     "offline_sensors": 36,
     "fault_sensors": 0,
     "total_sensors": 36,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPU 1A": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 70.44718831168832,
+    "avg_percentage": 70.49262987012989,
     "good_sensors": 3,
     "warning_sensors": 2,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPU 1B": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 49.4937987012987,
+    "avg_percentage": 49.516067821067814,
     "good_sensors": 3,
     "warning_sensors": 1,
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPU 2A": {
     "status": "OFFLINE",
@@ -602,7 +602,7 @@
     "offline_sensors": 5,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "HPU 2B": {
     "status": "OFFLINE",
@@ -613,95 +613,95 @@
     "offline_sensors": 5,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "Heat Stress": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 50.108534266290306,
+    "avg_percentage": 50.13776194720009,
     "good_sensors": 188,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 188,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "JP-5 FCS": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 65.4214457296198,
+    "avg_percentage": 65.88267446823112,
     "good_sensors": 11,
     "warning_sensors": 6,
     "offline_sensors": 1,
     "fault_sensors": 2,
     "total_sensors": 20,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "JP-5 MCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 24.388625986623886,
+    "avg_percentage": 24.559283553485656,
     "good_sensors": 2,
     "warning_sensors": 0,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 4,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO SVC": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 51.24704317681422,
+    "avg_percentage": 51.24565250623028,
     "good_sensors": 18,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 18,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO SVC FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 57.654746986572796,
+    "avg_percentage": 61.850515982887764,
     "good_sensors": 5,
     "warning_sensors": 1,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 6,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO SVC MCS": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 53.84166287761563,
-    "good_sensors": 8,
+    "avg_percentage": 54.63705992363807,
+    "good_sensors": 9,
     "warning_sensors": 28,
-    "offline_sensors": 24,
+    "offline_sensors": 23,
     "fault_sensors": 0,
     "total_sensors": 60,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO XFER": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 45.605051056344024,
+    "avg_percentage": 43.78714991272274,
     "good_sensors": 10,
     "warning_sensors": 1,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 13,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO XFER FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 52.874719570576794,
-    "good_sensors": 21,
-    "warning_sensors": 5,
+    "avg_percentage": 52.95794437222578,
+    "good_sensors": 22,
+    "warning_sensors": 4,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 28,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LO XFER MCS": {
     "status": "WARNING",
@@ -712,18 +712,18 @@
     "offline_sensors": 7,
     "fault_sensors": 0,
     "total_sensors": 18,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LPAC 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 46.0843509818332,
-    "good_sensors": 30,
+    "avg_percentage": 45.807193713121976,
+    "good_sensors": 29,
     "warning_sensors": 1,
-    "offline_sensors": 3,
+    "offline_sensors": 4,
     "fault_sensors": 0,
     "total_sensors": 34,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LPAC 2": {
     "status": "OFFLINE",
@@ -734,7 +734,7 @@
     "offline_sensors": 34,
     "fault_sensors": 0,
     "total_sensors": 34,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "LPAC 3": {
     "status": "OFFLINE",
@@ -745,29 +745,29 @@
     "offline_sensors": 34,
     "fault_sensors": 0,
     "total_sensors": 34,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MCS": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 50.60595012300158,
-    "good_sensors": 732,
-    "warning_sensors": 1992,
-    "offline_sensors": 1921,
+    "avg_percentage": 50.50192835034885,
+    "good_sensors": 695,
+    "warning_sensors": 2002,
+    "offline_sensors": 1948,
     "fault_sensors": 0,
     "total_sensors": 4645,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MD 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 43.670138888888886,
+    "avg_percentage": 43.63726851851851,
     "good_sensors": 5,
     "warning_sensors": 1,
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 8,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MD 2": {
     "status": "OFFLINE",
@@ -778,18 +778,18 @@
     "offline_sensors": 8,
     "fault_sensors": 0,
     "total_sensors": 8,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MRG 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 46.27820512820514,
+    "avg_percentage": 46.25519568151147,
     "good_sensors": 30,
     "warning_sensors": 21,
     "offline_sensors": 27,
     "fault_sensors": 0,
     "total_sensors": 78,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MRG 2": {
     "status": "OFFLINE",
@@ -800,18 +800,18 @@
     "offline_sensors": 78,
     "fault_sensors": 0,
     "total_sensors": 78,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MRG DH 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 36.99701533333334,
+    "avg_percentage": 37.04417432098765,
     "good_sensors": 5,
     "warning_sensors": 3,
     "offline_sensors": 7,
     "fault_sensors": 0,
     "total_sensors": 15,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "MRG DH 2": {
     "status": "OFFLINE",
@@ -822,18 +822,18 @@
     "offline_sensors": 15,
     "fault_sensors": 0,
     "total_sensors": 15,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "OW FCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 50.02570200809044,
-    "good_sensors": 12,
+    "avg_percentage": 51.53868508472406,
+    "good_sensors": 13,
     "warning_sensors": 2,
-    "offline_sensors": 2,
+    "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 16,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "OW MCS": {
     "status": "WARNING",
@@ -844,7 +844,7 @@
     "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 5,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "PLUMB WST": {
     "status": "WARNING",
@@ -855,29 +855,29 @@
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 2,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "REFR 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 55.31618689403521,
+    "avg_percentage": 56.08904676052007,
     "good_sensors": 26,
     "warning_sensors": 3,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 29,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "REFR 2": {
-    "status": "CRITICAL",
-    "running": "RUNNING (FAULT)",
+    "status": "OFFLINE",
+    "running": "STANDBY",
     "avg_percentage": 0,
     "good_sensors": 0,
     "warning_sensors": 0,
-    "offline_sensors": 28,
-    "fault_sensors": 1,
+    "offline_sensors": 29,
+    "fault_sensors": 0,
     "total_sensors": 29,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "REFRs": {
     "status": "WARNING",
@@ -888,18 +888,18 @@
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 2,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "RO 1A": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 47.16710754765643,
+    "avg_percentage": 47.19957869380707,
     "good_sensors": 24,
     "warning_sensors": 2,
     "offline_sensors": 4,
     "fault_sensors": 1,
     "total_sensors": 31,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "RO 1B": {
     "status": "OFFLINE",
@@ -910,62 +910,62 @@
     "offline_sensors": 31,
     "fault_sensors": 0,
     "total_sensors": 31,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "RO DMIN": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 44.372104404761906,
+    "avg_percentage": 44.00360743593733,
     "good_sensors": 17,
     "warning_sensors": 2,
     "offline_sensors": 5,
     "fault_sensors": 1,
     "total_sensors": 25,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "ROs": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 60.26666666666668,
+    "avg_percentage": 57.43518518518519,
     "good_sensors": 1,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 1,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SCBA": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 46.636635104166665,
+    "avg_percentage": 46.7518849537037,
     "good_sensors": 8,
     "warning_sensors": 0,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 8,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SECURITY": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 50.411170212765946,
+    "avg_percentage": 50.40721040189125,
     "good_sensors": 92,
     "warning_sensors": 1,
     "offline_sensors": 1,
     "fault_sensors": 0,
     "total_sensors": 94,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SHAFT 1": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 45.654126133196826,
+    "avg_percentage": 45.339434887169546,
     "good_sensors": 29,
     "warning_sensors": 7,
     "offline_sensors": 10,
     "fault_sensors": 0,
     "total_sensors": 46,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SHAFT 2": {
     "status": "OFFLINE",
@@ -976,72 +976,72 @@
     "offline_sensors": 41,
     "fault_sensors": 0,
     "total_sensors": 41,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SOUNDING": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 45.951091954023006,
+    "avg_percentage": 46.024521072796944,
     "good_sensors": 52,
     "warning_sensors": 1,
     "offline_sensors": 5,
     "fault_sensors": 0,
     "total_sensors": 58,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "SW": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 43.656152476510776,
-    "good_sensors": 12,
+    "avg_percentage": 42.864642407243785,
+    "good_sensors": 11,
     "warning_sensors": 13,
-    "offline_sensors": 18,
+    "offline_sensors": 19,
     "fault_sensors": 0,
     "total_sensors": 43,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "VCHT": {
-    "status": "GOOD",
-    "running": "RUNNING",
-    "avg_percentage": 15,
-    "good_sensors": 1,
+    "status": "OFFLINE",
+    "running": "STANDBY",
+    "avg_percentage": 5.555555555555555,
+    "good_sensors": 0,
     "warning_sensors": 0,
-    "offline_sensors": 1,
+    "offline_sensors": 2,
     "fault_sensors": 0,
     "total_sensors": 2,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "VENTLN": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 52.25518044432043,
-    "good_sensors": 3,
-    "warning_sensors": 20,
+    "avg_percentage": 51.574974047156424,
+    "good_sensors": 4,
+    "warning_sensors": 19,
     "offline_sensors": 19,
     "fault_sensors": 0,
     "total_sensors": 42,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "WW FCS": {
     "status": "WARNING",
     "running": "RUNNING",
-    "avg_percentage": 59.96622552432981,
+    "avg_percentage": 59.93971642661378,
     "good_sensors": 4,
     "warning_sensors": 5,
     "offline_sensors": 3,
     "fault_sensors": 0,
     "total_sensors": 12,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   },
   "WW MCS": {
     "status": "GOOD",
     "running": "RUNNING",
-    "avg_percentage": 69.84136175931437,
+    "avg_percentage": 68.6181135477252,
     "good_sensors": 3,
     "warning_sensors": 1,
     "offline_sensors": 0,
     "fault_sensors": 0,
     "total_sensors": 4,
-    "timestamp": "2026-02-16T14:07:47-06:00"
+    "timestamp": "2026-02-16T14:07:57-06:00"
   }
 }
