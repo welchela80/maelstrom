@@ -1,0 +1,13 @@
+{
+  "GTM 1B": {
+    "status": "CRITICAL",
+    "running": "RUNNING (FAULT)",
+    "avg_percentage": 25.347222560268403,
+    "good_sensors": 9,
+    "warning_sensors": 3,
+    "offline_sensors": 20,
+    "fault_sensors": 191,
+    "total_sensors": 223,
+    "timestamp": "2026-03-03T11:54:36-06:00"
+  }
+}

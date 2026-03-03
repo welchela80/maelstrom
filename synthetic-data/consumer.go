@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"strconv"
@@ -17,9 +16,53 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// =============================================================================
+// ERM Common Log Format (IDD v1.1.4 §Telemetry and Logging)
+// =============================================================================
+
+const appName = "sensor-consumer"
+
+type logEntry struct {
+	Time  string `json:"time"`
+	App   string `json:"app"`
+	Level string `json:"level"`
+	Msg   string `json:"msg"`
+}
+
+func logInfo(msg string)  { writeLog("info", msg) }
+func logError(msg string) { writeLog("error", msg) }
+func logFatal(msg string) { writeLog("fatal", msg); os.Exit(1) }
+
+func writeLog(level, msg string) {
+	entry := logEntry{
+		Time:  time.Now().UTC().Format(time.RFC3339),
+		App:   appName,
+		Level: level,
+		Msg:   msg,
+	}
+	data, _ := json.Marshal(entry)
+	fmt.Println(string(data))
+}
+
+// =============================================================================
+// Domain types
+// =============================================================================
+
+// SensorReading matches PDTSensorValue published by the ERM test driver.
+// Exchange:    erm.ex.values
+// Routing key: {SystemName}.{MachineName}.{SensorName}
 type SensorReading struct {
-	Timestamp string            `json:"timestamp"`
-	Readings  map[string]string `json:"readings"`
+	SystemName  string `json:"SystemName"`
+	MachineName string `json:"MachineName"`
+	SensorName  string `json:"SensorName"`
+	Value       string `json:"Value"`
+	SensorID    string `json:"SensorID"`
+}
+
+// SensorKey returns the composite lookup key matching the operational limits
+// CSV format: "MachineName:SensorName"
+func (r SensorReading) SensorKey() string {
+	return fmt.Sprintf("%s:%s", r.MachineName, r.SensorName)
 }
 
 type OperationalLimit struct {
@@ -29,8 +72,9 @@ type OperationalLimit struct {
 }
 
 type SensorAggregate struct {
-	Sum   float64
-	Count int
+	Sum      float64
+	Count    int
+	SensorID string // preserved from incoming message for outcome reporting
 }
 
 type MachineStatus struct {
@@ -43,16 +87,32 @@ type MachineStatus struct {
 	AvgPercentage  float64
 }
 
+// MachineStatusRecord tracks the last reported status per machine.
+// Retained for future use (e.g. alerting on change).
+type MachineStatusRecord struct {
+	Status    string
+	UpdatedAt time.Time
+}
+
 var operationalLimits map[string]OperationalLimit
 var sensorAggregates map[string]*SensorAggregate
 var aggregateMutex sync.Mutex
 var lastReportTime time.Time
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
-}
+// machineStatusHistory tracks the previous status of each machine.
+// Retained for future alerting use.
+var machineStatusHistory map[string]*MachineStatusRecord
+var statusHistoryMutex sync.Mutex
+
+// outcomeClient is the global GraphQL outcome poster
+var outcomeClient *OutcomeClient
+
+// reportInterval defines how often the report fires and outcomes are posted
+const reportInterval = 60 * time.Second
+
+// =============================================================================
+// Operational limits loader
+// =============================================================================
 
 func loadOperationalLimits(filename string) error {
 	file, err := os.Open(filename)
@@ -69,7 +129,6 @@ func loadOperationalLimits(filename string) error {
 
 	operationalLimits = make(map[string]OperationalLimit)
 
-	// Skip header row
 	for i := 1; i < len(records); i++ {
 		if len(records[i]) < 4 {
 			continue
@@ -77,15 +136,16 @@ func loadOperationalLimits(filename string) error {
 
 		system := records[i][0]
 		sensorName := records[i][1]
+
 		high, err := strconv.ParseFloat(records[i][2], 64)
 		if err != nil {
-			log.Printf("Warning: Invalid high value for %s: %s", sensorName, records[i][2])
+			logError(fmt.Sprintf("Invalid high value for sensor=%s value=%s", sensorName, records[i][2]))
 			continue
 		}
 
 		low, err := strconv.ParseFloat(records[i][3], 64)
 		if err != nil {
-			log.Printf("Warning: Invalid low value for %s: %s", sensorName, records[i][3])
+			logError(fmt.Sprintf("Invalid low value for sensor=%s value=%s", sensorName, records[i][3]))
 			continue
 		}
 
@@ -95,56 +155,82 @@ func loadOperationalLimits(filename string) error {
 			OperationalLow:  low,
 		}
 
-		// Log system info for first few entries
 		if i <= 3 {
-			log.Printf("Loaded: System=%s, Sensor=%s, Range=[%.2f - %.2f]", system, sensorName, low, high)
+			logInfo(fmt.Sprintf("Loaded limit system=%s sensor=%s low=%.2f high=%.2f", system, sensorName, low, high))
 		}
 	}
 
-	log.Printf("Loaded %d operational limits", len(operationalLimits))
+	logInfo(fmt.Sprintf("Operational limits loaded count=%d", len(operationalLimits)))
 	return nil
 }
+
+// =============================================================================
+// Aggregation
+// =============================================================================
 
 func addReadingToAggregate(reading SensorReading) {
 	aggregateMutex.Lock()
 	defer aggregateMutex.Unlock()
 
-	for sensorName, valueStr := range reading.Readings {
-		// Try to parse the value
-		value, err := strconv.ParseFloat(valueStr, 64)
-		if err != nil {
-			continue
-		}
+	value, err := strconv.ParseFloat(reading.Value, 64)
+	if err != nil {
+		logError(fmt.Sprintf("Failed to parse value sensor=%s value=%s", reading.SensorKey(), reading.Value))
+		return
+	}
 
-		// Check if we have a limit for this sensor
-		_, hasLimit := operationalLimits[sensorName]
-		if !hasLimit {
-			continue
-		}
+	sensorKey := reading.SensorKey()
 
-		// Add to aggregate
-		if sensorAggregates[sensorName] == nil {
-			sensorAggregates[sensorName] = &SensorAggregate{Sum: 0, Count: 0}
-		}
-		sensorAggregates[sensorName].Sum += value
-		sensorAggregates[sensorName].Count++
+	if _, hasLimit := operationalLimits[sensorKey]; !hasLimit {
+		return
+	}
+
+	if sensorAggregates[sensorKey] == nil {
+		sensorAggregates[sensorKey] = &SensorAggregate{}
+	}
+	sensorAggregates[sensorKey].Sum += value
+	sensorAggregates[sensorKey].Count++
+
+	// Preserve SensorID for outcome reporting
+	if reading.SensorID != "" {
+		sensorAggregates[sensorKey].SensorID = reading.SensorID
 	}
 }
+
+// =============================================================================
+// Status history — retained for future change-alerting use
+// =============================================================================
+
+func updateStatusHistory(machineName, newStatus string) {
+	statusHistoryMutex.Lock()
+	defer statusHistoryMutex.Unlock()
+	machineStatusHistory[machineName] = &MachineStatusRecord{
+		Status:    newStatus,
+		UpdatedAt: time.Now(),
+	}
+}
+
+// =============================================================================
+// Reporting
+// =============================================================================
 
 func printAverageReport() {
 	aggregateMutex.Lock()
 	defer aggregateMutex.Unlock()
 
 	if len(sensorAggregates) == 0 {
-		log.Println("No readings to report")
+		logInfo("No readings to report for this window")
 		return
 	}
 
-	fmt.Printf("\n=== AVERAGE SENSOR REPORT (10 second window) ===\n")
-	fmt.Printf("Report Time: %s\n", time.Now().Format("2006-01-02 15:04:05"))
+	windowEnd := time.Now()
+	windowStart := windowEnd.Add(-reportInterval)
+
+	logInfo("Generating 60-second average sensor report")
+
+	fmt.Printf("\\n=== AVERAGE SENSOR REPORT (60 second window) ===\\n")
+	fmt.Printf("Report Time: %s\\n", windowEnd.Format("2006-01-02 15:04:05"))
 	fmt.Println("  " + strings.Repeat("=", 130))
 
-	// Track statistics
 	belowCount := 0
 	inRangeCount := 0
 	aboveCount := 0
@@ -152,10 +238,16 @@ func printAverageReport() {
 	offlineCount := 0
 	warningCount := 0
 
-	// Track machine-level status
 	machineStats := make(map[string]*MachineStatus)
 
-	// Calculate and display averages
+	// Track sensor data per machine for outcome reporting
+	type machineSensorData struct {
+		faultSensors []FaultSensor
+		allSensors   []string
+		avgValues    map[string]float64
+	}
+	machineData := make(map[string]*machineSensorData)
+
 	for sensorName, aggregate := range sensorAggregates {
 		if aggregate.Count == 0 {
 			continue
@@ -164,20 +256,25 @@ func printAverageReport() {
 		avgValue := aggregate.Sum / float64(aggregate.Count)
 		limit := operationalLimits[sensorName]
 
-		// Extract machine name from sensor name (format: "MACHINE:SENSOR")
 		parts := strings.SplitN(sensorName, ":", 2)
 		machineName := "UNKNOWN"
 		if len(parts) == 2 {
 			machineName = parts[0]
 		}
 
-		// Initialize machine stats if needed
 		if machineStats[machineName] == nil {
 			machineStats[machineName] = &MachineStatus{}
 		}
-		machineStats[machineName].TotalSensors++
+		if machineData[machineName] == nil {
+			machineData[machineName] = &machineSensorData{
+				avgValues: make(map[string]float64),
+			}
+		}
 
-		// Calculate percentage of range
+		machineStats[machineName].TotalSensors++
+		machineData[machineName].allSensors = append(machineData[machineName].allSensors, sensorName)
+		machineData[machineName].avgValues[sensorName] = avgValue
+
 		rangeSpan := limit.OperationalHigh - limit.OperationalLow
 		var percentage float64
 		var percentageStr string
@@ -187,27 +284,28 @@ func printAverageReport() {
 			percentageStr = fmt.Sprintf("%6.2f%%", percentage)
 		} else {
 			percentageStr = "  N/A  "
-			percentage = 50 // Default to middle if no range
+			percentage = 50
 		}
 
-		// Add to machine average percentage
 		if percentage >= 0 && percentage <= 100 {
 			machineStats[machineName].AvgPercentage += percentage
 		}
 
-		// Determine status with refined labels
 		var status string
 		if avgValue > limit.OperationalHigh {
 			status = "🔴 ABOVE RANGE"
 			aboveCount++
 			machineStats[machineName].AboveSensors++
+			machineData[machineName].faultSensors = append(machineData[machineName].faultSensors,
+				FaultSensor{SensorKey: sensorName, SensorID: aggregate.SensorID, AvgValue: avgValue})
 		} else if avgValue < limit.OperationalLow {
 			status = "🔴 BELOW RANGE"
 			belowCount++
 			machineStats[machineName].BelowSensors++
+			machineData[machineName].faultSensors = append(machineData[machineName].faultSensors,
+				FaultSensor{SensorKey: sensorName, SensorID: aggregate.SensorID, AvgValue: avgValue})
 		} else {
 			inRangeCount++
-			// Within range - check percentage for fine-tuned status
 			if avgValue == 0 {
 				status = "⚪ OFFLINE"
 				offlineCount++
@@ -217,30 +315,29 @@ func printAverageReport() {
 				goodCount++
 				machineStats[machineName].GoodSensors++
 			} else if percentage < 20 {
-				status = "⚪ STANDBY" // Changed from "POSSIBLY OFFLINE"
+				status = "⚪ STANDBY"
 				offlineCount++
 				machineStats[machineName].OfflineSensors++
-			} else { // percentage > 80
+			} else {
 				status = "🟡 WARNING"
 				warningCount++
 				machineStats[machineName].WarningSensors++
 			}
 		}
 
-		fmt.Printf("  %-45s Avg: %8.2f | Range: [%8.2f - %8.2f] | %s | %-20s | Samples: %d\n",
+		fmt.Printf("  %-45s Avg: %8.2f | Range: [%8.2f - %8.2f] | %s | %-20s | Samples: %d\\n",
 			sensorName, avgValue, limit.OperationalLow, limit.OperationalHigh, percentageStr, status, aggregate.Count)
 	}
 
-	// Display sensor summary
 	fmt.Println("  " + strings.Repeat("=", 130))
-	fmt.Printf("  Sensor Summary: %d good (20-80%%) | %d warning (>80%%) | %d possibly offline (<20%%) | %d above range | %d below range\n",
+	fmt.Printf("  Sensor Summary: %d good (20-80%%) | %d warning (>80%%) | %d possibly offline (<20%%) | %d above range | %d below range\\n",
 		goodCount, warningCount, offlineCount, aboveCount, belowCount)
 
-	// Display machine-level status
-	fmt.Println("\n=== MACHINE STATUS ===")
+	_ = inRangeCount
+
+	fmt.Println("\\n=== MACHINE STATUS ===")
 	fmt.Println("  " + strings.Repeat("=", 130))
 
-	// Prepare data for JSON export
 	type MachineStatusJSON struct {
 		Status         string  `json:"status"`
 		Running        string  `json:"running"`
@@ -256,27 +353,23 @@ func printAverageReport() {
 	machineStatusJSON := make(map[string]MachineStatusJSON)
 
 	for machineName, stats := range machineStats {
-		// Calculate average percentage for sensors in range
 		inRangeSensors := stats.GoodSensors + stats.WarningSensors + stats.OfflineSensors
 		avgPercentage := 0.0
 		if inRangeSensors > 0 {
 			avgPercentage = stats.AvgPercentage / float64(inRangeSensors)
 		}
 
-		// Determine machine status
 		var machineStatus string
 		var isRunning string
 
-		// Machine is offline/standby if >50% of sensors are offline
 		offlineRatio := float64(stats.OfflineSensors) / float64(stats.TotalSensors)
 
-		// Machine has critical issues ONLY if sensors are outside limits (not just low)
 		if stats.AboveSensors > 0 || stats.BelowSensors > 0 {
 			machineStatus = "CRITICAL"
 			isRunning = "RUNNING (FAULT)"
 		} else if offlineRatio > 0.5 {
 			machineStatus = "OFFLINE"
-			isRunning = "STANDBY" // Changed from "NOT RUNNING"
+			isRunning = "STANDBY"
 		} else if stats.WarningSensors > stats.GoodSensors {
 			machineStatus = "WARNING"
 			isRunning = "RUNNING"
@@ -288,13 +381,17 @@ func printAverageReport() {
 			isRunning = "UNKNOWN"
 		}
 
-		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
+		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\\n",
 			machineName, machineStatus, isRunning, avgPercentage,
 			stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
 			stats.AboveSensors+stats.BelowSensors)
 
-		// Add to JSON export
-		statusJSON := MachineStatusJSON{
+		logInfo(fmt.Sprintf("Machine status machine=%s status=%s running=%s avg_pct=%.2f good=%d warn=%d offline=%d fault=%d",
+			machineName, machineStatus, isRunning, avgPercentage,
+			stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
+			stats.AboveSensors+stats.BelowSensors))
+
+		machineStatusJSON[machineName] = MachineStatusJSON{
 			Status:         machineStatus,
 			Running:        isRunning,
 			AvgPercentage:  avgPercentage,
@@ -306,137 +403,155 @@ func printAverageReport() {
 			Timestamp:      time.Now().Format(time.RFC3339),
 		}
 
-		machineStatusJSON[machineName] = statusJSON
+		// Update status history for future change-alerting use
+		updateStatusHistory(machineName, machineStatus)
+
+		// Post outcome every window unconditionally — 60-second heartbeat
+		mData := machineData[machineName]
+		payload := OutcomePayload{
+			MachineName:    machineName,
+			Status:         machineStatus,
+			Running:        isRunning,
+			FaultSensors:   mData.faultSensors,
+			AllSensorNames: mData.allSensors,
+			AvgPercentage:  avgPercentage,
+			WindowStart:    windowStart,
+			WindowEnd:      windowEnd,
+		}
+		go func(p OutcomePayload) {
+			if err := outcomeClient.PostOutcome(p); err != nil {
+				logError(fmt.Sprintf("Failed to post outcome machine=%s err=%s", p.MachineName, err))
+			}
+		}(payload)
 	}
 
 	fmt.Println("  " + strings.Repeat("=", 130))
 	fmt.Println()
 
-	// Write to JSON file for Streamlit dashboard
 	jsonData, err := json.MarshalIndent(machineStatusJSON, "", "  ")
 	if err == nil {
-		err = os.WriteFile("machine_status.json", jsonData, 0644)
-		if err != nil {
-			log.Printf("Warning: Could not write machine_status.json: %s", err)
+		if err = os.WriteFile("machine_status.json", jsonData, 0644); err != nil {
+			logError(fmt.Sprintf("Could not write machine_status.json: %s", err))
 		}
 	}
 
-	// Reset aggregates for next window
 	sensorAggregates = make(map[string]*SensorAggregate)
 }
 
+// =============================================================================
+// Main
+// =============================================================================
+
 func main() {
-	// Load operational limits
 	limitsFile := "files/sensor_operational_range.csv"
 	if len(os.Args) > 1 {
 		limitsFile = os.Args[1]
 	}
 
-	err := loadOperationalLimits(limitsFile)
-	if err != nil {
-		log.Printf("Warning: Could not load operational limits: %s", err)
-		log.Println("Continuing without limit checking...")
+	if err := loadOperationalLimits(limitsFile); err != nil {
+		logError(fmt.Sprintf("Could not load operational limits file=%s err=%s", limitsFile, err))
+		logInfo("Continuing without limit checking")
 	}
 
-	// Initialize aggregates
 	sensorAggregates = make(map[string]*SensorAggregate)
+	machineStatusHistory = make(map[string]*MachineStatusRecord)
 	lastReportTime = time.Now()
+
+	// Initialize outcome client
+	outcomeClient = NewOutcomeClient()
 
 	// Connect to RabbitMQ
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to connect to RabbitMQ: %s", err))
+	}
 	defer conn.Close()
+	logInfo("Connected to RabbitMQ")
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to open channel: %s", err))
+	}
 	defer ch.Close()
 
-	queueName := "sensor_readings"
-	q, err := ch.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
+	// Declare exchange
+	exchangeName := "erm.ex.values"
+	err = ch.ExchangeDeclare(exchangeName, "topic", true, false, false, false, nil)
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to declare exchange=%s err=%s", exchangeName, err))
+	}
+	logInfo(fmt.Sprintf("Exchange declared name=%s type=topic", exchangeName))
 
-	// Set QoS
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
+	// Declare queue per IDD: auto_delete=TRUE, exclusive=FALSE
+	queueName := "sensor-consumer-readings"
+	q, err := ch.QueueDeclare(queueName, false, true, false, false, nil)
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to declare queue=%s err=%s", queueName, err))
+	}
 
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	failOnError(err, "Failed to register a consumer")
+	// Bind queue to exchange
+	routingKey := "#"
+	err = ch.QueueBind(q.Name, routingKey, exchangeName, false, nil)
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to bind queue=%s exchange=%s err=%s", queueName, exchangeName, err))
+	}
+	logInfo(fmt.Sprintf("Queue bound queue=%s exchange=%s routing_key=%s", queueName, exchangeName, routingKey))
 
-	// Channel for graceful shutdown
+	err = ch.Qos(1, 0, false)
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to set QoS: %s", err))
+	}
+
+	consumerTag := "sensor-consumer-01"
+	msgs, err := ch.Consume(q.Name, consumerTag, false, false, false, false, nil)
+	if err != nil {
+		logFatal(fmt.Sprintf("Failed to register consumer: %s", err))
+	}
+	logInfo(fmt.Sprintf("Consumer registered queue=%s consumer_tag=%s", queueName, consumerTag))
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-
-	// Channel to signal goroutine completion
 	done := make(chan bool)
 
-	// Start 10-second ticker for reports
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(reportInterval)
 	defer ticker.Stop()
 
-	// Start report ticker goroutine
 	go func() {
 		for range ticker.C {
 			printAverageReport()
 		}
 	}()
 
-	// Start consumer goroutine
 	go func() {
 		messageCount := 0
 		for d := range msgs {
 			var reading SensorReading
-			err := json.Unmarshal(d.Body, &reading)
-			if err != nil {
-				log.Printf("Error parsing message: %s", err)
-				d.Nack(false, false)
+			if err := json.Unmarshal(d.Body, &reading); err != nil {
+				logError(fmt.Sprintf("Failed to parse message delivery_tag=%d err=%s", d.DeliveryTag, err))
+				d.Ack(false)
 				continue
 			}
-
-			// Add reading to aggregate
 			addReadingToAggregate(reading)
 			messageCount++
-
-			// Acknowledge message
 			d.Ack(false)
+
+			if messageCount%100 == 0 {
+				logInfo(fmt.Sprintf("Messages processed count=%d", messageCount))
+			}
 		}
 		done <- true
 	}()
 
-	log.Printf("Consumer started. Waiting for messages on queue '%s'...", queueName)
-	log.Printf("Reports will be generated every 10 seconds")
-	log.Printf("Press CTRL+C to exit")
+	logInfo(fmt.Sprintf("Consumer started exchange=%s routing_key=%s report_interval=%s",
+		exchangeName, routingKey, reportInterval))
+	logInfo("Press CTRL+C to exit")
 
-	// Wait for interrupt signal
 	<-sigChan
-	log.Println("\nShutting down gracefully...")
+	logInfo("Shutdown signal received — shutting down gracefully")
 
-	// Print final report
 	printAverageReport()
-
-	// Close channel to stop consuming
 	ch.Close()
-
-	// Wait for goroutine to finish
 	<-done
 
-	log.Println("Consumer stopped")
+	logInfo("Consumer stopped")
 }
