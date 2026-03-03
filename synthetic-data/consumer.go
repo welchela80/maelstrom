@@ -227,8 +227,8 @@ func printAverageReport() {
 
 	logInfo("Generating 60-second average sensor report")
 
-	fmt.Printf("\\n=== AVERAGE SENSOR REPORT (60 second window) ===\\n")
-	fmt.Printf("Report Time: %s\\n", windowEnd.Format("2006-01-02 15:04:05"))
+	fmt.Printf("\n=== AVERAGE SENSOR REPORT (60 second window) ===\n")
+	fmt.Printf("Report Time: %s\n", windowEnd.Format("2006-01-02 15:04:05"))
 	fmt.Println("  " + strings.Repeat("=", 130))
 
 	belowCount := 0
@@ -325,17 +325,17 @@ func printAverageReport() {
 			}
 		}
 
-		fmt.Printf("  %-45s Avg: %8.2f | Range: [%8.2f - %8.2f] | %s | %-20s | Samples: %d\\n",
+		fmt.Printf("  %-45s Avg: %8.2f | Range: [%8.2f - %8.2f] | %s | %-20s | Samples: %d\n",
 			sensorName, avgValue, limit.OperationalLow, limit.OperationalHigh, percentageStr, status, aggregate.Count)
 	}
 
 	fmt.Println("  " + strings.Repeat("=", 130))
-	fmt.Printf("  Sensor Summary: %d good (20-80%%) | %d warning (>80%%) | %d possibly offline (<20%%) | %d above range | %d below range\\n",
+	fmt.Printf("  Sensor Summary: %d good (20-80%%) | %d warning (>80%%) | %d possibly offline (<20%%) | %d above range | %d below range\n",
 		goodCount, warningCount, offlineCount, aboveCount, belowCount)
 
 	_ = inRangeCount
 
-	fmt.Println("\\n=== MACHINE STATUS ===")
+	fmt.Println("\n=== MACHINE STATUS ===")
 	fmt.Println("  " + strings.Repeat("=", 130))
 
 	type MachineStatusJSON struct {
@@ -381,7 +381,7 @@ func printAverageReport() {
 			isRunning = "UNKNOWN"
 		}
 
-		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\\n",
+		fmt.Printf("  %-30s Status: %-20s | Running: %-20s | Avg: %6.2f%% | Sensors: %d good, %d warn, %d offline, %d fault\n",
 			machineName, machineStatus, isRunning, avgPercentage,
 			stats.GoodSensors, stats.WarningSensors, stats.OfflineSensors,
 			stats.AboveSensors+stats.BelowSensors)
@@ -460,8 +460,10 @@ func main() {
 	// Initialize outcome client
 	outcomeClient = NewOutcomeClient()
 
-	// Connect to RabbitMQ
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	// Connect to RabbitMQ — URL from env with localhost fallback for local dev
+	mqURL := getEnv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
+	logInfo(fmt.Sprintf("Connecting to RabbitMQ url=%s", mqURL))
+	conn, err := amqp.Dial(mqURL)
 	if err != nil {
 		logFatal(fmt.Sprintf("Failed to connect to RabbitMQ: %s", err))
 	}

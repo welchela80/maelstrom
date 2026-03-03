@@ -1,13 +1,13 @@
 {
-  "GTM 1B": {
+  "LPAC 1": {
     "status": "CRITICAL",
     "running": "RUNNING (FAULT)",
-    "avg_percentage": 23.040227896579573,
-    "good_sensors": 9,
-    "warning_sensors": 2,
-    "offline_sensors": 20,
-    "fault_sensors": 192,
-    "total_sensors": 223,
-    "timestamp": "2026-03-03T11:56:16-06:00"
+    "avg_percentage": 23.594773449055356,
+    "good_sensors": 10,
+    "warning_sensors": 1,
+    "offline_sensors": 10,
+    "fault_sensors": 8,
+    "total_sensors": 29,
+    "timestamp": "2026-03-03T13:23:56-06:00"
   }
 }

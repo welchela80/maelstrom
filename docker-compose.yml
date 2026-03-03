@@ -1,0 +1,23 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sensor-consumer:
+    build:
+      context: .                          # repo root — gives access to both synthetic-data/ and files/
+      dockerfile: synthetic-data/Dockerfile
+    platform: linux/amd64
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - envVars.env
+    restart: unless-stopped
